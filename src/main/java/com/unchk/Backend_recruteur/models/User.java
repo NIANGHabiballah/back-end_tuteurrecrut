@@ -19,6 +19,8 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private String resetToken;
+
   @NotBlank
   @Size(max = 20)
   private String username;
@@ -78,6 +80,14 @@ public class User {
   public void setPassword(String password) {
     this.password = password;
   }
+
+  public String getResetToken() {
+    return resetToken;
+}
+
+public void setResetToken(String resetToken) {
+    this.resetToken = resetToken;
+}
 
   public Set<Role> getRoles() {
     return roles;

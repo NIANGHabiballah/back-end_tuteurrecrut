@@ -77,13 +77,13 @@ public class AuthController {
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity
           .badRequest()
-          .body(new MessageResponse("Error: Username is already taken!"));
+          .body(new MessageResponse("Erreur : le nom d'utilisateur est déjà pris!"));
     }
 
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
       return ResponseEntity
           .badRequest()
-          .body(new MessageResponse("Error: Email is already in use!"));
+          .body(new MessageResponse("Erreur : l e-mail est déjà présent chez nous!"));
     }
 
     // Create new user's account
@@ -96,32 +96,32 @@ public class AuthController {
 
     if (strRoles == null) {
       Role userRole = roleRepository.findByName(ERole.USER)
-          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          .orElseThrow(() -> new RuntimeException("Erreur : le rôle est introuvable."));
       roles.add(userRole);
     } else {
       strRoles.forEach(role -> {
         switch (role) {
         case "admin":
           Role adminRole = roleRepository.findByName(ERole.ADMIN)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+              .orElseThrow(() -> new RuntimeException("Erreur : le rôle est introuvable."));
           roles.add(adminRole);
 
           break;
         case "recruteur":
           Role recruteurRole = roleRepository.findByName(ERole.RECRUTEUR)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+              .orElseThrow(() -> new RuntimeException("Erreur : le rôle est introuvable."));
           roles.add(recruteurRole);
 
           break;
           case "candidat":
             Role candidatRole = roleRepository.findByName(ERole.CANDIDAT)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    .orElseThrow(() -> new RuntimeException("Erreur : le rôle est introuvable."));
             roles.add(candidatRole);
 
             break;
         default:
           Role userRole = roleRepository.findByName(ERole.USER)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+              .orElseThrow(() -> new RuntimeException("Erreur : le rôle est introuvable."));
           roles.add(userRole);
         }
       });
@@ -130,6 +130,6 @@ public class AuthController {
     user.setRoles(roles);
     userRepository.save(user);
 
-    return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    return ResponseEntity.ok(new MessageResponse("Utilisateur enregistré avec succès!"));
   }
 }
