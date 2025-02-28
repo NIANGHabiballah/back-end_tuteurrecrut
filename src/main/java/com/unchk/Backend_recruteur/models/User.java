@@ -34,6 +34,10 @@ public class User {
   @Size(max = 120)
   private String password;
 
+  private String firstName;
+  private String lastName;
+  private String profilePicture;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(  name = "user_roles", 
         joinColumns = @JoinColumn(name = "user_id"), 
@@ -76,18 +80,41 @@ public class User {
   public String getPassword() {
     return password;
   }
-
   public void setPassword(String password) {
     this.password = password;
   }
 
   public String getResetToken() {
     return resetToken;
-}
+  }
 
-public void setResetToken(String resetToken) {
+  public void setResetToken(String resetToken) {
     this.resetToken = resetToken;
-}
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public String getProfilePicture() {
+    return profilePicture;
+  }
+
+  public void setProfilePicture(String profilePicture) {
+    this.profilePicture = profilePicture;
+  }
 
   public Set<Role> getRoles() {
     return roles;
