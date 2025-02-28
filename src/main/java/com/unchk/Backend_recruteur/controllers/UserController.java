@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -21,42 +22,40 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody User updatedUser) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findById(userDetails.getId()).orElse(null);
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body("Utilisateur non trouvé avec cet e-mail");
         }
 
-        user.setFirstName(updatedUser.getFirstName());
-        user.setLastName(updatedUser.getLastName());
-        user.setProfilePicture(updatedUser.getProfilePicture());
+        String resetToken = UUID.randomUUID().toString();
+        user.setResetToken(resetToken);
         userRepository.save(user);
 
-        return ResponseEntity.ok("L'utilisateur a été mis à jour avec succès");
+        // Envoyer un e-mail avec le jeton de réinitialisation
+        // emailService.sendSimpleMessage(user.getEmail(), "Réinitialisation de mot de passe", "Pour réinitialiser votre mot de passe, cliquez sur le lien suivant : http://localhost:8080/reset-password?token=" + resetToken);
+
+        return ResponseEntity.ok("Un e-mail de réinitialisation de mot de passe a été envoyé");
     }
 
-    @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findById(userDetails.getId()).orElse(null);
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+
+        User user = userRepository.findByResetToken(token).orElse(null);
 
         if (user == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body("Jeton de réinitialisation invalide");
         }
 
-        String ancienMotdePasse = request.get("ancienMotdePasse");
-        String nouveauMotdePasse = request.get("nouveauMotdePasse");
-
-        if (!passwordEncoder.matches(ancienMotdePasse, user.getPassword())) {
-            return ResponseEntity.badRequest().body("Aancien mot de passe est incorrect");
-        }
-
-        user.setPassword(passwordEncoder.encode(nouveauMotdePasse));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
         userRepository.save(user);
 
-        return ResponseEntity.ok("Mot de passe modifié avec succès");
+        return ResponseEntity.ok("Mot de passe réinitialisé avec succès");
     }
 }

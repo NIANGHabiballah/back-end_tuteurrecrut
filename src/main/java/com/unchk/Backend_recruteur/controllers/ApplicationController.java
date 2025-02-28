@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -47,12 +47,12 @@ public class ApplicationController {
             return ResponseEntity.notFound().build();
         }
 
-        Application application = applicationRepository.findByUser(user).orElse(null);
+        Optional<Application> application = applicationRepository.findByUser(user);
 
-        if (application == null) {
+        if (!application.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(application.getStatus());
+        return ResponseEntity.ok(application.get().getStatus());
     }
 }
